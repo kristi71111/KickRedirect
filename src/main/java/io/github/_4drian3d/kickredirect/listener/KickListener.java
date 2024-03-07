@@ -56,22 +56,26 @@ public final class KickListener implements AwaitingEventExecutor<KickedFromServe
     public EventTask executeAsync(final KickedFromServerEvent event) {
         return EventTask.withContinuation(continuation -> {
             final Player player = event.getPlayer();
-            if (shouldKick(player, event.getServer())) {
+            final RegisteredServer server = event.getServer();
+            final Configuration configuration = configurationContainer.get();
+            if(shouldSkipServer(server, configuration)){
+                return;
+            }
+            if (shouldKick(player, server)) {
                 continuation.resume();
-                cache(event, event.getServer().getServerInfo().getName(), KickStep.REPEATED_ATTEMPT);
+                cache(event, server.getServerInfo().getName(), KickStep.REPEATED_ATTEMPT);
                 // This should keep the "original" DisconnectPlayer result
                 return;
             }
             if (reasonCheck(event)) {
-                final Configuration configuration = configurationContainer.get();
-                final RegisteredServer server = configuration
+                final RegisteredServer server2Redirect2 = configuration
                         .getSendMode()
                         .server(
                                 proxyServer,
                                 configuration.getServersToRedirect(),
                                 configuration.getRandomAttempts()
                         );
-                if (server == null) {
+                if (server2Redirect2 == null) {
                     source.sendMessage(formatter.format(
                             messagesContainer.get().noServersFoundToRedirect(),
                             player,
@@ -84,10 +88,10 @@ public final class KickListener implements AwaitingEventExecutor<KickedFromServe
                     continuation.resume();
                     cache(event, null, KickStep.NULL_SERVER);
                 } else {
-                    event.setResult(redirectResult(server, player));
+                    event.setResult(redirectResult(server2Redirect2, player));
                     continuation.resume();
-                    cache(event, server.getServerInfo().getName(), KickStep.AVAILABLE_SERVER);
-                    addToSent(player, server);
+                    cache(event, server2Redirect2.getServerInfo().getName(), KickStep.AVAILABLE_SERVER);
+                    addToSent(player, server2Redirect2);
                 }
             } else {
                 continuation.resume();
@@ -162,6 +166,10 @@ public final class KickListener implements AwaitingEventExecutor<KickedFromServe
     // https://github.com/4drian3d/KickRedirect/issues/5
     boolean shouldKick(final Player player, final RegisteredServer server) {
         return Objects.equals(sent.getIfPresent(player.getUniqueId()), server.getServerInfo().getName());
+    }
+
+    boolean shouldSkipServer(final RegisteredServer server, Configuration configuration) {
+        return configuration.getServersToNotRedirectFrom().contains(server.getServerInfo().getName());
     }
 
     @Override

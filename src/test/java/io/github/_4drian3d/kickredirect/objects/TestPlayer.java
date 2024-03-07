@@ -3,6 +3,7 @@ package io.github._4drian3d.kickredirect.objects;
 import java.net.InetSocketAddress;
 import java.util.*;
 
+import com.velocitypowered.api.network.ProtocolState;
 import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.api.permission.Tristate;
 import com.velocitypowered.api.proxy.ConnectionRequestBuilder;
@@ -53,6 +54,11 @@ public class TestPlayer implements Player {
     }
 
     @Override
+    public ProtocolState getProtocolState() {
+        return null;
+    }
+
+    @Override
     public InetSocketAddress getRemoteAddress() {
         return new InetSocketAddress(404);
     }
@@ -91,6 +97,21 @@ public class TestPlayer implements Player {
     @Override
     public @Nullable String getClientBrand() {
         return null;
+    }
+
+    @Override
+    public void addCustomChatCompletions(@NotNull Collection<String> collection) {
+
+    }
+
+    @Override
+    public void removeCustomChatCompletions(@NotNull Collection<String> collection) {
+
+    }
+
+    @Override
+    public void setCustomChatCompletions(@NotNull Collection<String> collection) {
+
     }
 
     @Override

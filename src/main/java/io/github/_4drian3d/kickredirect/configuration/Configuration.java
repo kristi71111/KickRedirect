@@ -18,6 +18,10 @@ public final class Configuration implements Section {
             Depending on the configuration of sendMode it will be sent to one server or another""")
     private List<String> serversToRedirect = List.of("lobby1", "lobby2");
 
+    @Comment("""
+            Sets the list of available servers to not forward from""")
+    private List<String> serversToNotRedirectFrom = List.of("Example");
+
     @Comment("Redirect the player if the expulsion message is null or empty")
     private boolean redirectOnNullMessage = true;
 
@@ -51,6 +55,10 @@ public final class Configuration implements Section {
 
     public List<String> getServersToRedirect(){
         return this.serversToRedirect;
+    }
+
+    public List<String> getServersToNotRedirectFrom(){
+        return this.serversToNotRedirectFrom;
     }
 
     public CheckMode checkMode() {
