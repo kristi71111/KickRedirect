@@ -59,6 +59,7 @@ public final class KickListener implements AwaitingEventExecutor<KickedFromServe
             final RegisteredServer server = event.getServer();
             final Configuration configuration = configurationContainer.get();
             if(shouldSkipServer(server, configuration)){
+                player.disconnect(Component.text("Disconnected"));
                 return;
             }
             if (shouldKick(player, server)) {
